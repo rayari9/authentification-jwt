@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.HTMLDocument;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 @RestController
@@ -33,8 +35,10 @@ public class feedBdAPIs {
             String completeData = new String(fileBytes);
             String[] data = completeData.split("#");
             String[] rowData = data[0].split(System.getProperty("line.separator" ));
-            Arrays.stream(rowData).forEach(line -> {
-                String[] userLine = line.split(";");
+
+            Iterator<String> iterator = Arrays.stream(rowData).iterator();
+            while(iterator.hasNext()) {
+                String[] userLine = iterator.next().split(";");
                 if(applicationUserRepository.existsByUsername(userLine[0]))
                     listUsers.add("erreur "+userLine[0]);
                 else {
@@ -42,8 +46,7 @@ public class feedBdAPIs {
                     ApplicationUser u = applicationUserRepository.save(user);
                     listUsers.add("Ajout réussi "+u.getUsername());
                 }
-
-            });
+            }
             return listUsers;
     }
 }
